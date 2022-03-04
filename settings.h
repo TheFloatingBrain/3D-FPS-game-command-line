@@ -1,5 +1,5 @@
 #pragma             once
-
+#include <math.h>
 #define w           120
 #define h           30
 

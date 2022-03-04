@@ -5,8 +5,18 @@ in command promt.
 *****************************************/
 
 #include <stdio.h>
-#include <winsock2.h>
-#include <windows.h>
+#include <math.h>
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+	#include <winsock2.h>
+	#include <windows.h>
+#else
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
+#endif
+
 #include <stdlib.h>
 #include <malloc.h>
 #include <math.h>
@@ -154,19 +164,27 @@ int main(void){
     if(cs == 'c'){
         printf("Server IP:\n");
         scanf("\n%s", stringh);
-        sa.sin_addr.S_un.S_addr = inet_addr(stringh);
-        connect(s, &sa, sizeof(sa));
+	#if defined(_WIN32) || defined(__CYGWIN__)
+	        sa.sin_addr.S_un.S_addr = inet_addr(stringh);
+	        connect(s, &sa, sizeof(sa));
+	#else
+	        sa.sin_addr.s_addr = inet_addr(stringh);
+	        connect(s, (struct sockaddr*)&sa, sizeof(sa));
+	#endif
     }
     else
     if(cs == 's'){
 
-        bind(s, &sa, sizeof(sa));
-        listen(s, 100);
-
-        SOCKADDR_IN client_addr;
-
+	#if defined(_WIN32) || defined(__CYGWIN__)
+        	bind(s, &sa, sizeof(sa));
+        	listen(s, 100);
+	        SOCKADDR_IN client_addr;
+	#else
+	        bind(s, (struct sockaddr*)&sa, sizeof(sa));
+	        listen(s, 100);
+		struct sockaddr client_addr;
+	#endif
         int client_addr_size = sizeof(client_addr);
-
 
         while(!(client_socket = accept(s, &client_addr, &client_addr_size)))
             ;
@@ -182,7 +200,9 @@ int main(void){
         castrays();
         newscreen();
         playerA = p.x;
-        GetCursorPos(&p);
+        //GetCursorPos(&p);
+	//TODO: Temporary until GetCursorPos can be substituted for.//
+	playerA = ( ( int ) round( playerA + 1.0 ) % 80 );
         if(cs == 'c'){
             data[0] = playerX;
             data[1] = playerY;

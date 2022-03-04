@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include "keyboard.h"
 #include "settings.h"
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+#else
+	void Sleep(unsigned int time){
+		sleep(time);
+	}
+#endif
 
 extern char* screen;
 
@@ -24,17 +32,17 @@ typedef enum {
 
 menupunct choosedpunct = mserver;
 
-static enum bds {
+static enum bds_ {
     upleft,
     downleft,
     upright,
     downright
-};
+} bds;
 
-static enum lns {
+static enum lns_ {
     vertical,
     horizontal
-};
+} lns;
 
 void loadtexture(Texture* t, char path[]){
     FILE* f = fopen(path, "r");
@@ -158,12 +166,12 @@ menupunct getuserinput(Texture logo){
         }
         /* INPUT */
     
-        enter = (GetKeyState(13) & 0x8000);
+        enter = (ReadKey(13));
         
-        choosedpunct += ((GetKeyState(40) & 0x8000) && !pressed);
-        choosedpunct -= ((GetKeyState(38) & 0x8000) && !pressed);
+        choosedpunct += ((ReadKey(40)) && !pressed);
+        choosedpunct -= ((ReadKey(38)) && !pressed);
 
-        pressed = (GetKeyState(40) & 0x8000) || (GetKeyState(38) & 0x8000);
+        pressed = (ReadKey(40)) || (ReadKey(38));
 
         printf("%s", screen);
 

@@ -4,6 +4,21 @@
 
 #include "settings.h"
 
+
+// Yoinked from https://www.strudel.org.uk/itoa/ //
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+#else
+	char* itoa(int val, char* buf, int base){
+		//static char buf[32] = {0};
+		int i = 30;
+		for(; val && i ; --i, val /= base)
+			buf[i] = "0123456789abcdef"[val % base];
+		return &buf[i+1];
+	}
+
+#endif
+
 void parsetextures(int walls, char tets[][texturex][texturey]){
     size_t i;
     char c = 0;

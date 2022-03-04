@@ -1,9 +1,20 @@
-#include <windows.h>
+#if defined(_WIN32) || defined(__CYGWIN__)
+	#include <windows.h>
+#else
+	typedef long int LONG;
+	typedef struct tagPOINT {
+		LONG x;
+		LONG y;
+	} POINT;
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "settings.h"
 #include "collision.h"
+#include "keyboard.h"
 
 POINT p;
 
@@ -31,35 +42,40 @@ void cameramove(void){
     cameraz = cos(shet * 0.2) * 2 + 3;
 }
 
+
+
 void update(void){
-        if(GetKeyState(87) & 0x8000 && collision(playerX + (speed * coloffset) * cos(radians(playerA)), playerY + speed * sin(radians(playerA)))){
+        if(ReadKey(87) && collision(playerX + (speed * coloffset) * cos(radians(playerA)), playerY + speed * sin(radians(playerA)))){
             playerX += speed * cos(radians(playerA));
             playerY += speed * sin(radians(playerA));
             cameramove();
         }
-        if(GetKeyState(83) & 0x8000 && collision(playerX - (speed * coloffset) * cos(radians(playerA)), playerY - speed * sin(radians(playerA)))){
+        if(ReadKey(83) && collision(playerX - (speed * coloffset) * cos(radians(playerA)), playerY - speed * sin(radians(playerA)))){
             playerX -= speed * cos(radians(playerA));
             playerY -= speed * sin(radians(playerA));
             cameramove();
         }
-        if(GetKeyState(65) & 0x8000 && collision(playerX + (speed * coloffset) * cos(radians(playerA)), playerY - speed * sin(radians(playerA)))){
+        if(ReadKey(65) && collision(playerX + (speed * coloffset) * cos(radians(playerA)), playerY - speed * sin(radians(playerA)))){
             playerX += speed * sin(radians(playerA));
             playerY -= speed * cos(radians(playerA));
             cameramove();
         }
-        if(GetKeyState(68) & 0x8000 && collision(playerX - (speed * coloffset) * cos(radians(playerA)), playerY + speed * sin(radians(playerA)))){
+        if(ReadKey(68) && collision(playerX - (speed * coloffset) * cos(radians(playerA)), playerY + speed * sin(radians(playerA)))){
             playerX -= speed * sin(radians(playerA));
             playerY += speed * cos(radians(playerA));
             cameramove();
         }
-        if(GetKeyState(32) & 0x8000){
+        if(ReadKey(32)){
             if(!shoot && !re && !restart){
                 shoot = 1;
                 se = 1;
             }
         }
-        if(GetKeyState('B') & 0x8000 && cs == 's')
+        if(ReadKey('B') && cs == 's')
             ban = 1;
-        if(GetKeyState(EXIT_CODE) & 0x8000)
+        if(ReadKey(EXIT_CODE))
             EXIT = 1;
 }
+
+
+
